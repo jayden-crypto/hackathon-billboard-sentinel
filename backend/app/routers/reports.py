@@ -105,7 +105,7 @@ def get_all_reports():
             'status': report.status,
             'timestamp': report.captured_at.isoformat(),
             'detections': detection_data,
-            'image': f"/static/uploads/{report.img_uri.split('/')[-1]}" if report.img_uri else "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Billboard+Detection",
+            'image': f"/uploads/{report.img_uri.split('/')[-1]}" if report.img_uri else "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Billboard+Detection",
             'archived': report.archived,
             'archived_at': report.archived_at.isoformat() if report.archived_at else None
         })
