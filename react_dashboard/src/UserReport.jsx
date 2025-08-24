@@ -369,6 +369,30 @@ export default function UserReport() {
     }));
   };
 
+  // Function to clear old localStorage data to prevent quota issues
+  const clearOldStorageData = () => {
+    try {
+      // Clear old image data (keep only last 5 images)
+      const reports = JSON.parse(localStorage.getItem('githubPageReports') || '[]');
+      const reportsToKeep = reports.slice(0, 5);
+      const imagesToKeep = reportsToKeep.map(r => r.image.replace('placeholder-', '')).filter(Boolean);
+      
+      // Remove old image keys
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('report-image-')) {
+          const reportId = key.replace('report-image-', '');
+          if (!imagesToKeep.includes(reportId)) {
+            localStorage.removeItem(key);
+          }
+        }
+      });
+      
+      console.log('Cleared old storage data');
+    } catch (e) {
+      console.log('Error clearing old storage:', e);
+    }
+  };
+
   const submitReport = async () => {
     if (!capturedImage || !reportData.consent) {
       alert('Please take a photo and give consent to submit a report.');
@@ -376,6 +400,9 @@ export default function UserReport() {
     }
 
     setIsSubmitting(true);
+    
+    // Clear old data before storing new report
+    clearOldStorageData();
     
     try {
       // Check if we're on GitHub Pages or localhost
@@ -401,24 +428,76 @@ export default function UserReport() {
           }
         }
         
-        // Store report in localStorage for GitHub Pages
+        // Store report in localStorage for GitHub Pages (without large image data)
+        const reportId = Date.now().toString();
         const newReport = {
-          id: Date.now().toString(),
-          location: locationName || `Location ${Date.now().toString().slice(-8)}`,
+          id: reportId,
+          location: locationName || `Location ${reportId.slice(-8)}`,
           coordinates: [lat, lon],
           status: "Pending Review",
           timestamp: new Date().toISOString(),
           detections: ["Billboard", "No License"],
-          image: capturedImage.dataUrl,
+          image: `placeholder-${reportId}`, // Use placeholder instead of full image data
           description: reportData.description,
           archived: "false",
           archived_at: null
         };
         
-        // Get existing reports from localStorage
-        const existingReports = JSON.parse(localStorage.getItem('githubPageReports') || '[]');
-        existingReports.unshift(newReport); // Add to beginning
-        localStorage.setItem('githubPageReports', JSON.stringify(existingReports));
+        try {
+          // Get existing reports from localStorage
+          const existingReports = JSON.parse(localStorage.getItem('githubPageReports') || '[]');
+          
+          // Limit to last 10 reports to prevent storage overflow
+          const limitedReports = existingReports.slice(0, 9);
+          limitedReports.unshift(newReport); // Add to beginning
+          
+          localStorage.setItem('githubPageReports', JSON.stringify(limitedReports));
+          
+          // Store image separately with size limit check
+          const imageKey = `report-image-${reportId}`;
+          try {
+            // Compress image data if too large
+            let imageData = capturedImage.dataUrl;
+            if (imageData && imageData.length > 500000) { // 500KB limit
+              // Create a smaller version
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const img = new Image();
+              img.onload = () => {
+                // Resize to max 400x300
+                const maxWidth = 400;
+                const maxHeight = 300;
+                let { width, height } = img;
+                
+                if (width > maxWidth || height > maxHeight) {
+                  const ratio = Math.min(maxWidth / width, maxHeight / height);
+                  width *= ratio;
+                  height *= ratio;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const compressedData = canvas.toDataURL('image/jpeg', 0.6);
+                try {
+                  localStorage.setItem(imageKey, compressedData);
+                } catch (e) {
+                  console.log('Could not store compressed image, using placeholder');
+                }
+              };
+              img.src = imageData;
+            } else if (imageData) {
+              localStorage.setItem(imageKey, imageData);
+            }
+          } catch (imageError) {
+            console.log('Could not store image data:', imageError.message);
+          }
+        } catch (storageError) {
+          console.error('localStorage error:', storageError);
+          alert('Storage limit reached. Please clear some data or use the local API version.');
+          return;
+        }
         
         console.log('Report stored in localStorage:', newReport);
         console.log('Image data URL length:', newReport.image ? newReport.image.length : 'No image');

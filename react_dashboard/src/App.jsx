@@ -117,6 +117,22 @@ export default function App() {
         if (storedReports) {
           try {
             apiReports = JSON.parse(storedReports);
+            
+            // Load images from separate storage keys
+            apiReports = apiReports.map(report => {
+              if (report.image && report.image.startsWith('placeholder-')) {
+                const reportId = report.image.replace('placeholder-', '');
+                const imageKey = `report-image-${reportId}`;
+                const storedImage = localStorage.getItem(imageKey);
+                if (storedImage) {
+                  report.image = storedImage;
+                } else {
+                  report.image = "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Billboard+Detection";
+                }
+              }
+              return report;
+            });
+            
             console.log('Loaded reports from localStorage:', apiReports);
           } catch (e) {
             console.log('Error parsing stored reports:', e);
