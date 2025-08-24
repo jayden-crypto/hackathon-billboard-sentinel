@@ -1,0 +1,160 @@
+# Billboard Violation Rules Configuration
+# Defines regulatory compliance rules for billboard detection system
+
+billboard_regulations:
+  size_limits:
+    # Maximum allowed dimensions in square meters
+    residential_zone:
+      max_area_sqm: 10.0
+      max_width_m: 4.0
+      max_height_m: 3.0
+    commercial_zone:
+      max_area_sqm: 25.0
+      max_width_m: 8.0
+      max_height_m: 4.0
+    highway_zone:
+      max_area_sqm: 50.0
+      max_width_m: 12.0
+      max_height_m: 6.0
+    industrial_zone:
+      max_area_sqm: 100.0
+      max_width_m: 15.0
+      max_height_m: 8.0
+
+  placement_restrictions:
+    # Distance requirements in meters
+    traffic_junction_distance:
+      minimum_meters: 100.0
+      reason: "Safety - prevents driver distraction at intersections"
+    
+    traffic_signal_distance:
+      minimum_meters: 50.0
+      reason: "Visibility - must not obstruct traffic signals"
+    
+    road_edge_distance:
+      minimum_meters: 3.0
+      reason: "Safety clearance from vehicle path"
+    
+    residential_building_distance:
+      minimum_meters: 25.0
+      reason: "Privacy and noise considerations"
+    
+    school_zone_distance:
+      minimum_meters: 200.0
+      reason: "Child safety and appropriate content"
+    
+    hospital_zone_distance:
+      minimum_meters: 100.0
+      reason: "Quiet zone requirements"
+
+  content_restrictions:
+    prohibited_content:
+      - "obscene_material"
+      - "adult_content"
+      - "gambling_advertisements"
+      - "tobacco_products"
+      - "alcohol_near_schools"
+      - "political_content_election_period"
+    
+    required_disclaimers:
+      - "advertiser_identification"
+      - "permit_number_display"
+      - "contact_information"
+
+  licensing_requirements:
+    permit_required: true
+    permit_types:
+      - "temporary_event"      # 30 days max
+      - "commercial_standard"  # 1 year
+      - "highway_billboard"    # 2 years
+      - "digital_display"      # 6 months
+    
+    renewal_period_days: 365
+    inspection_required: true
+    inspection_frequency_months: 6
+
+  structural_safety:
+    wind_load_rating:
+      minimum_kmh: 120
+      reason: "Must withstand severe weather"
+    
+    foundation_requirements:
+      concrete_depth_m: 1.5
+      engineering_certification: true
+    
+    electrical_safety:
+      required_for_illuminated: true
+      certified_electrician: true
+
+  environmental_compliance:
+    light_pollution:
+      max_luminance_cd_sqm: 300
+      auto_dimming_required: true
+      hours_restriction: "22:00-06:00"
+    
+    noise_limits:
+      max_decibels: 55
+      measurement_distance_m: 10
+    
+    waste_management:
+      recyclable_materials_required: true
+      disposal_plan_required: true
+
+violation_severity:
+  critical:
+    - "traffic_safety_obstruction"
+    - "structural_instability" 
+    - "electrical_hazard"
+    - "obscene_content_display"
+  
+  major:
+    - "size_limit_exceeded"
+    - "junction_distance_violation"
+    - "missing_permit"
+    - "content_restriction_violation"
+  
+  minor:
+    - "permit_display_missing"
+    - "maintenance_required"
+    - "lighting_compliance"
+    - "minor_placement_issue"
+
+enforcement_actions:
+  critical:
+    immediate_removal: true
+    fine_amount_usd: 5000
+    permit_suspension: true
+    legal_action: true
+  
+  major:
+    notice_period_days: 7
+    fine_amount_usd: 1500
+    correction_required: true
+    reinspection_required: true
+  
+  minor:
+    notice_period_days: 30
+    fine_amount_usd: 300
+    warning_issued: true
+    voluntary_compliance: true
+
+reporting_requirements:
+  citizen_reports:
+    photo_evidence_required: true
+    gps_location_required: true
+    description_required: true
+    contact_info_optional: true
+  
+  inspector_reports:
+    detailed_measurements: true
+    safety_assessment: true
+    compliance_checklist: true
+    photographic_documentation: true
+    follow_up_schedule: true
+
+data_retention:
+  violation_records: "7_years"
+  citizen_reports: "2_years"
+  photos_with_consent: "5_years"
+  photos_without_consent: "30_days"
+  inspector_reports: "10_years"
