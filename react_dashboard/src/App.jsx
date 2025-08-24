@@ -94,7 +94,7 @@ export default function App() {
                         report.status === 'investigating' ? 'Under Investigation' : 
                         report.status === 'resolved' ? 'Resolved' : report.status,
                 detections: tags.length > 0 ? tags : ['Billboard'],
-                image: report.image || "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Billboard+Detection",
+                image: report.image ? `http://localhost:8000${report.image}` : "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Billboard+Detection",
                 archived: report.archived || 'false',
                 archived_at: report.archived_at
               };
